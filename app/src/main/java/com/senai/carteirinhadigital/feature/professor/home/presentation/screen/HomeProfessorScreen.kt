@@ -20,7 +20,7 @@ import com.senai.carteirinhadigital.feature.auth.domain.model.PerfilAcesso
 import com.senai.carteirinhadigital.feature.auth.domain.model.UsuarioLogado
 import com.senai.carteirinhadigital.ui.theme.CarteirinhaDigitalTheme
 
-@Composable
+@Composable //er
 fun HomeProfessorScreen(
     usuarioLogado: UsuarioLogado,
     onTurmasClick: () -> Unit,
