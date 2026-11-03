@@ -1,0 +1,46 @@
+RELATÓRIO — SINCRONIZAÇÃO CARTEIRINHA DIGITAL ANDROID ↔ API
+
+Atualizações aplicadas ao projeto Android:
+
+1. IDs do professor alinhados ao contrato real da API:
+   - A API devolve id e turmaId como UUIDs serializados em JSON string.
+   - Turma.id agora é String.
+   - UnidadeCurricularProfessor.id e turmaId agora são String.
+   - DTOs e modelos de domínio foram alinhados.
+
+2. Pacotes Kotlin corrigidos:
+   - A pasta do modelo é feature/professor/turmas, mas o package/import anterior usava feature/professor/turma (singular).
+   - Imports em DTO, repository e UiState agora apontam para o package correto.
+
+3. Tratamento de autorização:
+   - Repositórios do professor mostram uma mensagem específica para HTTP 403.
+   - HTTP 401 continua sinalizando sessão expirada.
+   - Isso não contorna a segurança do backend; se houver 403, deve-se verificar o perfil e as authorities no token.
+
+4. Rede:
+   - O endereço base permanece http://10.0.2.2:8080/, correto para Android Emulator acessando a máquina host.
+   - AuthInterceptor continua enviando Authorization: Bearer <token> automaticamente.
+   - O logging HTTP foi reduzido de BODY para BASIC para não imprimir corpos de requisição, como senhas, no Logcat.
+
+Endpoints utilizados:
+- POST /auth/login
+- GET /unidades-curriculares (aluno)
+- GET /professores/me/turmas (professor)
+- GET /professores/me/unidades-curriculares (professor)
+
+Credenciais de desenvolvimento descritas no README da API:
+- aluno / 123
+- maria / 456
+- professor / 123 (confirmado pelos testes de integração da API)
+
+Como executar:
+1. Inicie a API na porta 8080.
+2. No Android Studio, extraia e abra a pasta CarteirinhaDigital-master.
+3. Confirme que o emulador Android consegue acessar a API por http://10.0.2.2:8080/.
+4. Faça login com as credenciais acima.
+5. Compile com Build > Make Project e teste tanto o perfil Aluno quanto Professor.
+
+Limites da validação:
+- O ZIP foi atualizado por análise estática dos contratos e dos fontes fornecidos.
+- A compilação Android completa e os testes em emulador precisam ser executados no Android Studio.
+- Se a API estiver em outra máquina física, 10.0.2.2 não serve; será necessário usar o IP LAN da máquina que hospeda a API e permitir acesso à porta 8080.
