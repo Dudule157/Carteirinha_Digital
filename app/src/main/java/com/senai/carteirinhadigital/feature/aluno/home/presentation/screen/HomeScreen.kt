@@ -19,10 +19,10 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.senai.carteirinhadigital.app.navigation.GraphRoutes
 import com.senai.carteirinhadigital.core.designsystem.component.NavigationButton
-import com.senai.carteirinhadigital.core.designsystem.theme.CarteirinhaDigitalTheme
 import com.senai.carteirinhadigital.feature.auth.domain.model.UsuarioLogado
 import com.senai.carteirinhadigital.feature.aluno.home.presentation.component.BotaoNavegacao
 import com.senai.carteirinhadigital.feature.auth.domain.model.PerfilAcesso
+import com.senai.carteirinhadigital.ui.theme.CarteirinhaDigitalTheme
 
 @Composable
 fun HomeScreen(

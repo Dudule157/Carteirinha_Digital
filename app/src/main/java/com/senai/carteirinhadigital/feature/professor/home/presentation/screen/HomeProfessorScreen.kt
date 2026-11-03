@@ -15,9 +15,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.senai.carteirinhadigital.core.designsystem.component.NavigationButton
-import com.senai.carteirinhadigital.core.designsystem.theme.CarteirinhaDigitalTheme
+
 import com.senai.carteirinhadigital.feature.auth.domain.model.PerfilAcesso
 import com.senai.carteirinhadigital.feature.auth.domain.model.UsuarioLogado
+import com.senai.carteirinhadigital.ui.theme.CarteirinhaDigitalTheme
 
 @Composable
 fun HomeProfessorScreen(

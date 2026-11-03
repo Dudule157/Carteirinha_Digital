@@ -23,9 +23,10 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import com.senai.carteirinhadigital.core.designsystem.theme.CarteirinhaDigitalTheme
+
 import com.senai.carteirinhadigital.feature.auth.presentation.LoginEvent
 import com.senai.carteirinhadigital.feature.auth.presentation.LoginUiState
+import com.senai.carteirinhadigital.ui.theme.CarteirinhaDigitalTheme
 
 @Composable
 fun LoginContent(

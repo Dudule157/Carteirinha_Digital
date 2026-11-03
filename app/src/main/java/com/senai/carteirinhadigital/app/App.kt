@@ -9,7 +9,7 @@ import androidx.compose.runtime.setValue
 import androidx.navigation.compose.rememberNavController
 import com.senai.carteirinhadigital.app.di.AppContainer
 import com.senai.carteirinhadigital.app.navigation.AppNavHost
-import com.senai.carteirinhadigital.core.designsystem.theme.CarteirinhaDigitalTheme
+import com.senai.carteirinhadigital.ui.theme.CarteirinhaDigitalTheme
 
 @Composable
 fun App(container: AppContainer) {
