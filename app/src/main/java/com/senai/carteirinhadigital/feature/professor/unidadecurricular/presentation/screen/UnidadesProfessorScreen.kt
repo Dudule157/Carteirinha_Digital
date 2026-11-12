@@ -1,4 +1,3 @@
-
 package com.senai.carteirinhadigital.feature.professor.unidadecurricular.presentation.screen
 
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,8 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.senai.carteirinhadigital.feature.professor.unidadecurricular.presentation.UnidadeCurricularProfessorViewModel
-import kotlin.collections.joinToString
-import kotlin.text.orEmpty
 
 @Composable
 fun UnidadesProfessorScreen(
@@ -35,127 +33,107 @@ fun UnidadesProfessorScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(viewModel) {
-        viewModel.carregar()
-    }
-//sdfsdfsdkjhjh
+    LaunchedEffect(viewModel) { viewModel.carregar() }
+
     when {
-        state.isLoading -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+        state.isLoading -> Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
 
-        state.errorMessage != null -> {
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = state.errorMessage.orEmpty(),
-                    color = MaterialTheme.colorScheme.error
-                )
+        state.errorMessage != null -> Column(
+            modifier = modifier.fillMaxSize().padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = state.errorMessage.orEmpty(),
+                color = MaterialTheme.colorScheme.error
+            )
+            Button(
+                onClick = viewModel::carregar,
+                modifier = Modifier.padding(top = 12.dp)
+            ) { Text("Tentar novamente") }
+        }
 
-                Button(
-                    onClick = viewModel::carregar,
-                    modifier = Modifier.padding(top = 12.dp)
+        state.unidades.isEmpty() -> Box(
+            modifier = modifier.fillMaxSize().padding(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Você não possui unidades curriculares vinculadas.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        else -> LazyColumn(
+            modifier = modifier.fillMaxSize().padding(horizontal = 18.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            item {
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(5.dp),
+                    modifier = Modifier.padding(bottom = 4.dp)
                 ) {
-                    Text("Tentar novamente")
+                    Text(
+                        text = "Minhas unidades curriculares",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Unidades e turmas vinculadas ao seu perfil.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
+                    )
                 }
             }
-        }
-
-        state.unidades.isEmpty() -> {
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Você não possui unidades curriculares vinculadas.")
-            }
-        }
-
-        else -> {
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                item {
+            items(items = state.unidades, key = { it.id }) { unidade ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
                     Column(
-                        verticalArrangement = Arrangement.spacedBy(4.dp),
-                        modifier = Modifier.padding(bottom = 4.dp)
+                        modifier = Modifier.padding(18.dp),
+                        verticalArrangement = Arrangement.spacedBy(10.dp)
                     ) {
                         Text(
-                            text = "Minhas Unidades Curriculares",
-                            style = MaterialTheme.typography.headlineSmall,
+                            text = unidade.nome,
+                            style = MaterialTheme.typography.titleMedium,
                             fontWeight = FontWeight.Bold
                         )
-
                         Text(
-                            text = "Unidades e turmas vinculadas ao seu perfil.",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                            text = "Turma: ${unidade.turma}",
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = MaterialTheme.colorScheme.primary,
+                            fontWeight = FontWeight.SemiBold
                         )
-                    }
-                }
-
-                items(
-                    items = state.unidades,
-                    key = { unidade -> unidade.id }
-                ) { unidade ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
-                        )
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
                             Text(
-                                text = unidade.nome,
-                                style = MaterialTheme.typography.titleMedium,
-                                fontWeight = FontWeight.Bold
+                                text = "Carga horária: ${unidade.cargaHoraria}h",
+                                color = MaterialTheme.colorScheme.onSurfaceVariant
                             )
-
                             Text(
-                                text = "Turma: ${unidade.turma}",
-                                style = MaterialTheme.typography.bodyLarge,
+                                text = "Aulas: ${unidade.aulasRealizadas}/${unidade.quantidadeAulas}",
+                                fontWeight = FontWeight.Bold,
                                 color = MaterialTheme.colorScheme.primary
                             )
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text(
-                                    text = "Carga horária: ${unidade.cargaHoraria}h",
-                                    style = MaterialTheme.typography.bodyMedium
-                                )
-
-                                Text(
-                                    text = "Aulas: ${unidade.aulasRealizadas}/${unidade.quantidadeAulas}",
-                                    fontWeight = FontWeight.SemiBold
-                                )
-                            }
-
-                            Text(
-                                text = "Dias: ${unidade.diasSemana.joinToString(", ")}"
-                            )
-
-                            Text(
-                                text = "Horário: ${unidade.horarioInicio} – ${unidade.horarioFim}"
-                            )
                         }
+                        Text(
+                            text = "Dias: ${unidade.diasSemana.joinToString(", ")}",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "Horário: ${unidade.horarioInicio} – ${unidade.horarioFim}",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
                     }
                 }
             }

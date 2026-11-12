@@ -1,29 +1,31 @@
 package com.senai.carteirinhadigital.feature.auth.presentation.screen
 
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
-import androidx.compose.material3.LinearProgressIndicator
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.OutlinedTextFieldDefaults
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-
 import com.senai.carteirinhadigital.feature.auth.presentation.LoginEvent
 import com.senai.carteirinhadigital.feature.auth.presentation.LoginUiState
 import com.senai.carteirinhadigital.ui.theme.CarteirinhaDigitalTheme
@@ -32,76 +34,101 @@ import com.senai.carteirinhadigital.ui.theme.CarteirinhaDigitalTheme
 fun LoginContent(
     modifier: Modifier = Modifier,
     uiState: LoginUiState,
-    onEvent:(LoginEvent)-> Unit
+    onEvent: (LoginEvent) -> Unit
 ) {
     Column(
+        modifier = modifier
+            .fillMaxSize()
+            .padding(horizontal = 28.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(
-            10.dp,
-            Alignment.CenterVertically
-        ),
-        modifier =modifier
+        verticalArrangement = Arrangement.Center
     ) {
         Text(
-            text = "Login",
-            fontSize = 30.sp,
-            fontWeight = FontWeight.Bold
+            text = "CARTEIRINHA",
+            color = MaterialTheme.colorScheme.primary,
+            fontSize = 13.sp,
+            fontWeight = FontWeight.Bold,
+            letterSpacing = 3.sp
         )
-        TextField(
-            value = uiState.usuario,
-            onValueChange = {
-                onEvent(LoginEvent.OnUsuarioChange(it))
-            },
-            isError = uiState.credentialError,
-            label = {Text(text = "Usuario")
-            }
+        Spacer(Modifier.height(10.dp))
+        Text(
+            text = "Entrar",
+            style = MaterialTheme.typography.headlineLarge,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colorScheme.onBackground
+        )
+        Spacer(Modifier.height(8.dp))
+        Text(
+            text = "Acesse sua conta para continuar",
+            style = MaterialTheme.typography.bodyMedium,
+            color = MaterialTheme.colorScheme.onSurfaceVariant
+        )
+        Spacer(Modifier.height(32.dp))
 
-        )
-        TextField(
-            value = uiState.senha,
-            onValueChange = {
-                onEvent(LoginEvent.OnSenhaChange(it))
-            },
+        OutlinedTextField(
+            value = uiState.usuario,
+            onValueChange = { onEvent(LoginEvent.OnUsuarioChange(it)) },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Usuário") },
+            singleLine = true,
             isError = uiState.credentialError,
-            label = {Text(text = "Senha")}
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary
+            )
         )
+        Spacer(Modifier.height(14.dp))
+        OutlinedTextField(
+            value = uiState.senha,
+            onValueChange = { onEvent(LoginEvent.OnSenhaChange(it)) },
+            modifier = Modifier.fillMaxWidth(),
+            label = { Text("Senha") },
+            singleLine = true,
+            isError = uiState.credentialError,
+            visualTransformation = PasswordVisualTransformation(),
+            keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Password),
+            shape = RoundedCornerShape(12.dp),
+            colors = OutlinedTextFieldDefaults.colors(
+                focusedBorderColor = MaterialTheme.colorScheme.primary,
+                unfocusedBorderColor = MaterialTheme.colorScheme.outline,
+                focusedLabelColor = MaterialTheme.colorScheme.primary,
+                cursorColor = MaterialTheme.colorScheme.primary
+            )
+        )
+
         uiState.errorMessage?.let { error ->
+            Spacer(Modifier.height(12.dp))
             Text(
                 text = error,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colorScheme.error,
-                modifier = Modifier.fillMaxWidth(0.85f)
+                modifier = Modifier.fillMaxWidth()
             )
         }
+
+        Spacer(Modifier.height(24.dp))
         Button(
-            onClick = {
-                onEvent(LoginEvent.OnEntrarClick)
-            },
+            onClick = { onEvent(LoginEvent.OnEntrarClick) },
             enabled = !uiState.isLoading,
-            shape = RoundedCornerShape(size = 4.dp),
-            border = BorderStroke(
-                width = 2.dp,
-                color = Color.Black
-            ),
-            colors = ButtonDefaults.buttonColors(
-                contentColor = MaterialTheme.colorScheme.secondary
-            ),
             modifier = Modifier
-                .fillMaxWidth(.6f)
+                .fillMaxWidth()
+                .height(52.dp),
+            shape = RoundedCornerShape(12.dp),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = MaterialTheme.colorScheme.primary,
+                contentColor = MaterialTheme.colorScheme.onPrimary
+            )
         ) {
-            if(uiState.isLoading){
-                LinearProgressIndicator(
-                    modifier = Modifier
-                        .fillMaxWidth(0.45f)
-                        .height(4.dp),
-                    color = Color.White,
-                    trackColor = Color.White.copy(alpha = 0.35f)
+            if (uiState.isLoading) {
+                CircularProgressIndicator(
+                    color = MaterialTheme.colorScheme.onPrimary,
+                    strokeWidth = 2.dp
                 )
-            }else{
-                Text(
-                    "Entrar",
-                    color = Color.White,
-                )
+            } else {
+                Text("ENTRAR", fontWeight = FontWeight.Bold, letterSpacing = 1.sp)
             }
         }
     }
@@ -110,30 +137,10 @@ fun LoginContent(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun LoginContentPreview() {
-    CarteirinhaDigitalTheme() {
+    CarteirinhaDigitalTheme {
         LoginContent(
             modifier = Modifier.fillMaxSize(),
-            uiState = LoginUiState(
-                usuario = "aluno",
-                senha = "123"
-            ),
-            onEvent = {}
-        )
-    }
-}
-
-@Preview(showBackground = true, name = "Login Error")
-@Composable
-private fun LoginContentErrorPreview() {
-    CarteirinhaDigitalTheme(){
-        LoginContent(
-            modifier = Modifier.fillMaxSize(),
-            uiState = LoginUiState(
-                usuario = "aluno",
-                senha = "000",
-                errorMessage = "Login ou senha inválidos",
-                credentialError = true
-            ),
+            uiState = LoginUiState(usuario = "aluno", senha = "123"),
             onEvent = {}
         )
     }

@@ -16,88 +16,73 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import androidx.lifecycle.viewmodel.compose.viewModel
-import com.senai.carteirinhadigital.feature.home.presentation.screen.UnidadeCurricularCard
 import com.senai.carteirinhadigital.feature.aluno.unidadecurricular.presentation.UnidadeCurricularViewModel
+import com.senai.carteirinhadigital.feature.home.presentation.screen.UnidadeCurricularCard
 
 @Composable
 fun UnidadeCurricularScreen(
     modifier: Modifier = Modifier,
-    viewModel: com.senai.carteirinhadigital.feature.aluno.unidadecurricular.presentation.UnidadeCurricularViewModel
+    viewModel: UnidadeCurricularViewModel
 ) {
-
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val errorMessage = uiState.errorMessage
 
-    LaunchedEffect(Unit) {
-        viewModel.carregar()
-    }
+    LaunchedEffect(viewModel) { viewModel.carregar() }
 
     when {
-        uiState.isLoading -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+        uiState.isLoading -> Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
 
-        errorMessage != null -> {
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = errorMessage,
-                    color = MaterialTheme.colorScheme.error
-                )
-                Button(
-                    modifier = Modifier
-                        .padding(top = 16.dp),
-                    onClick = {
-                        viewModel.carregar()
-                    }
-                ) {
-                    Text("Tentar novamente")
-                }
-            }
+        uiState.errorMessage != null -> Column(
+            modifier = modifier.fillMaxSize().padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = uiState.errorMessage.orEmpty(),
+                color = MaterialTheme.colorScheme.error
+            )
+            Button(
+                modifier = Modifier.padding(top = 16.dp),
+                onClick = viewModel::carregar
+            ) { Text("Tentar novamente") }
         }
 
-        uiState.unidades.isEmpty() -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                Text("Nenhuma unidade curricular encontrada.")
-            }
+        uiState.unidades.isEmpty() -> Box(
+            modifier = modifier.fillMaxSize().padding(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Nenhuma unidade curricular encontrada.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
         }
 
-        else -> {
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(
-                        horizontal = 16.dp,
-                        vertical = 12.dp
-                    ),
-                verticalArrangement = Arrangement
-                    .spacedBy(12.dp)
-            ) {
-                items(
-                    items = uiState.unidades,
-                    key = { it.id }
-                ) { unidadeCurricular ->
-                    _root_ide_package_.com.senai.carteirinhadigital.feature.home.presentation.screen.UnidadeCurricularCard(
-                        unidadeCurricular = unidadeCurricular
+        else -> LazyColumn(
+            modifier = modifier.fillMaxSize().padding(horizontal = 18.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            item {
+                Column(verticalArrangement = Arrangement.spacedBy(5.dp)) {
+                    Text(
+                        text = "Unidades curriculares",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Consulte suas notas, médias e faltas.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
                 }
+            }
+            items(items = uiState.unidades, key = { it.id }) { unidade ->
+                UnidadeCurricularCard(unidadeCurricular = unidade)
             }
         }
     }

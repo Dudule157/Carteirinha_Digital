@@ -1,4 +1,3 @@
-
 package com.senai.carteirinhadigital.feature.professor.turmas.presentation.screen
 
 import androidx.compose.foundation.layout.Arrangement
@@ -10,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
@@ -25,8 +25,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.senai.carteirinhadigital.feature.professor.turmas.presentation.TurmaProfessorViewModel
-import kotlin.collections.joinToString
-import kotlin.text.orEmpty
 
 @Composable
 fun TurmasProfessorScreen(
@@ -35,130 +33,103 @@ fun TurmasProfessorScreen(
 ) {
     val state by viewModel.uiState.collectAsStateWithLifecycle()
 
-    LaunchedEffect(viewModel) {
-        viewModel.carregar()
-    }
+    LaunchedEffect(viewModel) { viewModel.carregar() }
 
     when {
-        state.isLoading -> {
-            Box(
-                modifier = modifier.fillMaxSize(),
-                contentAlignment = Alignment.Center
-            ) {
-                CircularProgressIndicator()
-            }
+        state.isLoading -> Box(
+            modifier = modifier.fillMaxSize(),
+            contentAlignment = Alignment.Center
+        ) {
+            CircularProgressIndicator(color = MaterialTheme.colorScheme.primary)
         }
 
-        state.errorMessage != null -> {
-            Column(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.CenterHorizontally
-            ) {
-                Text(
-                    text = state.errorMessage.orEmpty(),
-                    color = MaterialTheme.colorScheme.error
-                )
+        state.errorMessage != null -> Column(
+            modifier = modifier.fillMaxSize().padding(24.dp),
+            verticalArrangement = Arrangement.Center,
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            Text(
+                text = state.errorMessage.orEmpty(),
+                color = MaterialTheme.colorScheme.error
+            )
+            Button(
+                onClick = viewModel::carregar,
+                modifier = Modifier.padding(top = 12.dp)
+            ) { Text("Tentar novamente") }
+        }
 
-                Button(
-                    onClick = viewModel::carregar,
-                    modifier = Modifier.padding(top = 12.dp)
+        state.turmas.isEmpty() -> Box(
+            modifier = modifier.fillMaxSize().padding(24.dp),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Você não possui turmas vinculadas.",
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+        }
+
+        else -> LazyColumn(
+            modifier = modifier.fillMaxSize().padding(horizontal = 18.dp, vertical = 14.dp),
+            verticalArrangement = Arrangement.spacedBy(14.dp)
+        ) {
+            item {
+                Column(
+                    modifier = Modifier.padding(bottom = 4.dp),
+                    verticalArrangement = Arrangement.spacedBy(5.dp)
                 ) {
-                    Text("Tentar novamente")
+                    Text(
+                        text = "Minhas turmas",
+                        style = MaterialTheme.typography.headlineSmall,
+                        fontWeight = FontWeight.Bold
+                    )
+                    Text(
+                        text = "Turmas vinculadas ao seu perfil de professor.",
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        style = MaterialTheme.typography.bodyMedium
+                    )
                 }
             }
-        }
-
-        state.turmas.isEmpty() -> {
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(24.dp),
-                contentAlignment = Alignment.Center
-            ) {
-                Text(
-                    text = "Você não possui turmas vinculadas.",
-                    style = MaterialTheme.typography.bodyLarge
-                )
-            }
-        }
-
-        else -> {
-            LazyColumn(
-                modifier = modifier
-                    .fillMaxSize()
-                    .padding(horizontal = 16.dp, vertical = 12.dp),
-                verticalArrangement = Arrangement.spacedBy(12.dp)
-            ) {
-                item {
+            items(items = state.turmas, key = { it.id }) { turma ->
+                Card(
+                    modifier = Modifier.fillMaxWidth(),
+                    shape = RoundedCornerShape(18.dp),
+                    colors = CardDefaults.cardColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceVariant
+                    ),
+                    elevation = CardDefaults.cardElevation(defaultElevation = 2.dp)
+                ) {
                     Column(
-                        modifier = Modifier.padding(bottom = 4.dp),
-                        verticalArrangement = Arrangement.spacedBy(4.dp)
+                        modifier = Modifier.padding(18.dp),
+                        verticalArrangement = Arrangement.spacedBy(9.dp)
                     ) {
                         Text(
-                            text = "Minhas Turmas",
-                            style = MaterialTheme.typography.headlineSmall,
-                            fontWeight = FontWeight.Bold
+                            text = turma.codigo,
+                            style = MaterialTheme.typography.titleLarge,
+                            fontWeight = FontWeight.Bold,
+                            color = MaterialTheme.colorScheme.primary
                         )
-
                         Text(
-                            text = "Turmas vinculadas ao seu perfil de professor.",
-                            color = MaterialTheme.colorScheme.onSurfaceVariant,
-                            style = MaterialTheme.typography.bodyMedium
+                            text = turma.curso,
+                            style = MaterialTheme.typography.titleMedium
                         )
-                    }
-                }
-
-                items(
-                    items = state.turmas,
-                    key = { turma -> turma.id }
-                ) { turma ->
-                    Card(
-                        modifier = Modifier.fillMaxWidth(),
-                        colors = CardDefaults.cardColors(
-                            containerColor = MaterialTheme.colorScheme.surfaceContainer
+                        Text(
+                            text = "Semestre: ${turma.semestre}",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
                         )
-                    ) {
-                        Column(
-                            modifier = Modifier.padding(16.dp),
-                            verticalArrangement = Arrangement.spacedBy(8.dp)
+                        Text(
+                            text = "Alunos: ${turma.quantidadeAlunos}",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Text(
+                            text = "Dias: ${turma.diasSemana.joinToString(", ")}",
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                        Row(
+                            modifier = Modifier.fillMaxWidth(),
+                            horizontalArrangement = Arrangement.SpaceBetween
                         ) {
-                            Text(
-                                text = turma.codigo,
-                                style = MaterialTheme.typography.titleLarge,
-                                fontWeight = FontWeight.Bold,
-                                color = MaterialTheme.colorScheme.primary
-                            )
-
-                            Text(
-                                text = turma.curso,
-                                style = MaterialTheme.typography.titleMedium
-                            )
-
-                            Text(
-                                text = "Semestre: ${turma.semestre}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-
-                            Text(
-                                text = "Alunos: ${turma.quantidadeAlunos}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-
-                            Text(
-                                text = "Dias: ${turma.diasSemana.joinToString(", ")}",
-                                style = MaterialTheme.typography.bodyMedium
-                            )
-
-                            Row(
-                                modifier = Modifier.fillMaxWidth(),
-                                horizontalArrangement = Arrangement.SpaceBetween
-                            ) {
-                                Text("Início: ${turma.horarioInicio}")
-                                Text("Fim: ${turma.horarioFim}")
-                            }
+                            Text("Início: ${turma.horarioInicio}")
+                            Text("Fim: ${turma.horarioFim}")
                         }
                     }
                 }

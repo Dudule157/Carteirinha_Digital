@@ -15,7 +15,7 @@ import com.senai.carteirinhadigital.ui.theme.CarteirinhaDigitalTheme
 fun App(container: AppContainer) {
 
     val systemDarkTheme = isSystemInDarkTheme()
-    var darkTheme by rememberSaveable { mutableStateOf(systemDarkTheme) }
+    var darkTheme by rememberSaveable { mutableStateOf(true) }
 
     CarteirinhaDigitalTheme(
         darkTheme = darkTheme

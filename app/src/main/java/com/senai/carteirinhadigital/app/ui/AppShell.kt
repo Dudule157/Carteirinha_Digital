@@ -3,9 +3,7 @@ package com.senai.carteirinhadigital.app.ui
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -30,6 +28,7 @@ import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Switch
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberDrawerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
@@ -42,7 +41,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import com.senai.carteirinhadigital.R
 import com.senai.carteirinhadigital.feature.auth.domain.model.UsuarioLogado
-
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -55,27 +53,21 @@ fun AppShell(
     onDarkThemeChange: (Boolean) -> Unit,
     onNavigateBack: () -> Unit,
     onLogout: () -> Unit,
-    content: @Composable (PaddingValues) -> Unit
+    content: @Composable (androidx.compose.foundation.layout.PaddingValues) -> Unit
 ) {
-
     val drawerState = rememberDrawerState(initialValue = DrawerValue.Closed)
     val scope = rememberCoroutineScope()
-
-    fun abrirDrawer() {
-        scope.launch { drawerState.open() }
-    }
 
     ModalNavigationDrawer(
         drawerState = drawerState,
         drawerContent = {
-            ModalDrawerSheet {
+            ModalDrawerSheet(
+                drawerContainerColor = MaterialTheme.colorScheme.surface
+            ) {
                 Column(
                     modifier = Modifier
                         .fillMaxHeight()
-                        .padding(
-                            horizontal = 24.dp,
-                            vertical = 28.dp
-                        ),
+                        .padding(horizontal = 24.dp, vertical = 28.dp),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
                     Image(
@@ -91,41 +83,33 @@ fun AppShell(
                                 shape = CircleShape
                             )
                     )
-
-                    Spacer(modifier = Modifier.height(12.dp))
-
+                    Spacer(Modifier.height(12.dp))
                     Text(
                         text = usuarioLogado.nome,
                         style = MaterialTheme.typography.titleMedium,
                         fontWeight = FontWeight.Bold
                     )
-
                     Text(
                         text = "Matrícula ${usuarioLogado.matricula}",
                         style = MaterialTheme.typography.bodyMedium,
                         color = MaterialTheme.colorScheme.onSurfaceVariant
                     )
-
-                    Spacer(modifier = Modifier.height(24.dp))
-                    HorizontalDivider()
+                    Spacer(Modifier.height(24.dp))
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
                             .padding(vertical = 18.dp),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        Text(
-                            text = "Tema escuro",
-                            modifier = Modifier.weight(1f)
-                        )
+                        Text("Tema escuro", modifier = Modifier.weight(1f))
                         Switch(
                             checked = darkTheme,
                             onCheckedChange = onDarkThemeChange
                         )
                     }
-                    HorizontalDivider()
-                    Spacer(modifier = Modifier.weight(1f))
-
+                    HorizontalDivider(color = MaterialTheme.colorScheme.outline)
+                    Spacer(Modifier.weight(1f))
                     OutlinedButton(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = onLogout
@@ -136,44 +120,35 @@ fun AppShell(
             }
         }
     ) {
-
         Scaffold(
+            containerColor = MaterialTheme.colorScheme.background,
             topBar = {
                 TopAppBar(
                     title = {
-                        Text(title)
+                        Text(
+                            text = title,
+                            fontWeight = FontWeight.SemiBold
+                        )
                     },
                     navigationIcon = {
-
-                        if (canNavigateBack) {
-                            IconButton(
-                                onClick = onNavigateBack
-                            ) {
-                                Icon(
-                                    imageVector = Icons.AutoMirrored.Filled.ArrowBack,
-                                    contentDescription = "Voltar"
-                                )
+                        IconButton(
+                            onClick = {
+                                if (canNavigateBack) onNavigateBack()
+                                else scope.launch { drawerState.open() }
                             }
-                        } else {
-                            IconButton(
-                                onClick = {
-                                    abrirDrawer()
-                                }
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.Menu,
-                                    contentDescription = "Abrir menu"
-                                )
-                            }
+                        ) {
+                            Icon(
+                                imageVector = if (canNavigateBack)
+                                    Icons.AutoMirrored.Filled.ArrowBack
+                                else Icons.Default.Menu,
+                                contentDescription = if (canNavigateBack) "Voltar" else "Abrir menu"
+                            )
                         }
                     },
                     actions = {
-                        if ( canNavigateBack ) {
-
+                        if (canNavigateBack) {
                             IconButton(
-                                onClick = {
-                                    abrirDrawer()
-                                }
+                                onClick = { scope.launch { drawerState.open() } }
                             ) {
                                 Icon(
                                     imageVector = Icons.Default.Menu,
@@ -181,7 +156,13 @@ fun AppShell(
                                 )
                             }
                         }
-                    }
+                    },
+                    colors = TopAppBarDefaults.topAppBarColors(
+                        containerColor = MaterialTheme.colorScheme.background,
+                        titleContentColor = MaterialTheme.colorScheme.onBackground,
+                        navigationIconContentColor = MaterialTheme.colorScheme.primary,
+                        actionIconContentColor = MaterialTheme.colorScheme.primary
+                    )
                 )
             },
             content = content
